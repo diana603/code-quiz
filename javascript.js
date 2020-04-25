@@ -1,4 +1,5 @@
-var counter = 15;
+var counter = 60;
+var questionIndex = 0
 var timer;
 
 var startbtn = document.querySelector(".start-button");
@@ -20,8 +21,8 @@ var questionsObj = [
         correctAnswer: 1
     },
     {
-        question: 'How many licks does it take to get to the center of a lolipop? ',
-        answers: ['1', 'New 3', 'The the value does not existe'],
+        question: 'How many licks does it take to get to the center of a lollipop ',
+        answers: ['1', '3', 'The the value does not existe'],
         correctAnswer: 2
     },
     {
@@ -34,15 +35,26 @@ var questionsObj = [
 startbtn.addEventListener("click", function (event) {
     console.log("user clicked button")
     startTimer();
-    questionsRenders();
 })
 
 function startTimer() {
     timer = setInterval(() => {
+        if (counter === 60) {
+            questionsRenders()
+            //console.log(questionsObj[questionIndex])
+            questionIndex++
+        }
         console.log(counter--)
         timerElm.textContent = "Time left: " + counter;
-        if (counter <= 0) {
+        if (counter <= 0 || questionIndex >= 5) {
             stopTimer();
+            renderScore();
+        }
+        if (counter % 15 === 0) {
+            questionsRenders()
+            //console.log(questionsObj[questionIndex]);
+            questionIndex++
+
         }
     }, 1000);
 
@@ -52,31 +64,55 @@ function stopTimer() {
     clearInterval(timer);
 }
 
+
 function questionsRenders() {
 
-    questionsObj.forEach(function (q, index) {
-        console.log(q.question);
+    var q = questionsObj[questionIndex]
+    var correctIndex = q.correctAnswer;
+    console.log(q.question);
 
-        quizQuestionElm = document.createElement('h1');
-        quizQuestionElm.setAttribute('class', "quiz-question");
-        quizQuestionElm.textContent = q.question;
+    quizQuestionElm = document.createElement('h1');
+    quizQuestionElm.setAttribute('class', "quiz-question");
+    quizQuestionElm.textContent = q.question;
 
-        var answersChoicesElm = document.createElement('div');
-        answersChoicesElm.setAttribute('class', 'answers-choices');
+    var answersChoicesElm = document.createElement('div');
+    answersChoicesElm.setAttribute('class', 'answers-choices');
 
-        q.answers.forEach(function (ans, index) {
-            var answerElm = document.createElement("button");
-            answerElm.setAttribute("data-index", index);
-            answerElm.textContent = ans;
-            answersChoicesElm.append(answerElm);
+    q.answers.forEach(function (ans, index) {
+        var answerElm = document.createElement("button");
+        answerElm.setAttribute("data-index", index);
+        answerElm.textContent = ans;
+        answerElm.addEventListener("click", function () {
+            if (Number(this.dataset.index) === correctIndex) {
+                console.log("correctAnswer");
+                questionsRenders();
+                questionIndex++
+
+            } else {
+                counter -= 10;
+                console.log("wrong Answer");
+            }
         });
+        answersChoicesElm.append(answerElm);
+    });
+    var statusElm = document.createElement("h2");
+    statusElm.setAttribute("data-index", questionIndex);
+    questionContainerElm.innerHTML = "";
 
-        var statusElm = document.createElement("h2");
-        statusElm.setAttribute("data-index", index);
+    questionContainerElm.append(quizQuestionElm, answersChoicesElm, statusElm);
+}
+function renderScore() {
+    var scoreHeader = document.createElement("h1");
+    var inputInital = document.createElement("input");
+    questionContainerElm.innerHTML = "";
+    scoreHeader.innerHTML = "You have reached the END! ";
+    var button = document.createElement("button");
+    button.innerHTML = "Submit";
+    questionContainerElm.append(scoreHeader, inputInital, button);
 
-        questionContainerElm.append(quizQuestionElm, answersChoicesElm, statusElm);
 
-    })
+
+
 }
 
 
