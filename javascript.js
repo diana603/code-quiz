@@ -1,6 +1,9 @@
 var counter = 60;
 var questionIndex = 0
 var timer;
+var correctAnswerCount = 0;
+
+
 
 var startbtn = document.querySelector(".start-button");
 var welcomeContainerElm = document.querySelector(".welcome-container");
@@ -66,6 +69,10 @@ function stopTimer() {
 
 
 function questionsRenders() {
+    if (questionIndex == 4) {
+        stopTimer();
+        renderScore();
+    }
 
     var q = questionsObj[questionIndex]
     var correctIndex = q.correctAnswer;
@@ -85,12 +92,14 @@ function questionsRenders() {
         answerElm.addEventListener("click", function () {
             if (Number(this.dataset.index) === correctIndex) {
                 console.log("correctAnswer");
+
                 questionsRenders();
-                questionIndex++
+                questionIndex++;
 
             } else {
                 counter -= 10;
                 console.log("wrong Answer");
+                questionIndex++;
             }
         });
         answersChoicesElm.append(answerElm);
@@ -104,17 +113,63 @@ function questionsRenders() {
 function renderScore() {
     var scoreHeader = document.createElement("h1");
     var inputInital = document.createElement("input");
+
     questionContainerElm.innerHTML = "";
     scoreHeader.innerHTML = "You have reached the END! ";
     var button = document.createElement("button");
+    button.setAttribute("class", "submit");
     button.innerHTML = "Submit";
-    questionContainerElm.append(scoreHeader, inputInital, button);
+    resultsContainerElm.append(scoreHeader, inputInital, button);
 
+    saveScore();
 
+    var userNameListElm = document.createElement('ul');
+    var usernameList = JSON.parse(sessionStorage.getItem('nameList'));
+
+    if (usernameList) {
+        usernameList.forEach(function (user) {
+            var userNameItem = document.createElement('li');
+            userNameItem.innerText = user;
+
+            userNameListElm.append(userNameItem);
+        })
+        resultsContainerElm.append(userNameListElm);
+
+    }
 
 
 }
 
+function saveScore() {
+
+    var submitButElm = document.querySelector('.submit');
+
+    submitButElm.addEventListener("click", function () {
+
+        var inputElm = document.querySelector("input");
+        var userName = inputElm.value;
+
+        var usersNamesStorage = JSON.parse(sessionStorage.getItem('nameList'));
+
+        if (usersNamesStorage) {
+            usersNamesStorage.push(userName);
+            sessionStorage.setItem("nameList", JSON.stringify(usersNamesStorage));
+
+        } else {
+            usersNamesStorage = [];
+            usersNamesStorage.push(userName);
+            sessionStorage.setItem("nameList", JSON.stringify(usersNamesStorage));
+        }
+
+        inputElm.innerText = '';
+        resultsContainerElm.innerHTML = '';
+
+        renderScore();
+
+
+    })
+
+}
 
 // clear interval to stop it. w3 schools
 //Steps i need to do for this hw.
