@@ -134,6 +134,7 @@ function renderScore() {
             userNameListElm.append(userNameItem);
         })
         resultsContainerElm.append(userNameListElm);
+        console.log("hello")
 
     }
 
